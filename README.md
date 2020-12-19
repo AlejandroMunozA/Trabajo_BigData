@@ -37,7 +37,7 @@ I.	Sitios Web:
 
 www.twitchmetrics.net
 
-twitchtracker.com
+www.twitchtracker.com
 
 II.	En qué consiste la página y de dónde se quiere extraer información:
 
