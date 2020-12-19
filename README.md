@@ -35,7 +35,9 @@ DESCRIPCIÓN
 
 I.	Sitios Web:
 www.twitchmetrics.net
+
 twitchtracker.com
+
 II.	En qué consiste la página y de dónde se quiere extraer información:
 
 Las páginas seleccionadas tienen como funciones principales la recolección de información y la de generación bases de datos que contengan referencias, métricas y estadísticas significativas relacionadas a la plataforma de streaming “Twitch”, que principalmente se asocia al mundo “gaming” y a los influencers o gamers que son sus partners oficiales, como también a aquellos que no lo son y transmiten su contenido en dicha plataforma. Ambas páginas transmiten o difunden información y métricas para los suscriptores interesados en tener una percepción más clara y/o para aquellos gamers o influencers a los que les llama la atención o tienen pensado volcarse de lleno al mundo del streaming. 
