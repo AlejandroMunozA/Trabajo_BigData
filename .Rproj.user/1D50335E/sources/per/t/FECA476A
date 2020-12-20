@@ -3,7 +3,7 @@
     "path": "~/GitHub/Trabajo_BigData/Trabajo_BigData.R",
     "project_path": "Trabajo_BigData.R",
     "type": "r_source",
-    "hash": "2336832233",
+    "hash": "418029729",
     "contents": "",
     "dirty": false,
     "created": 1608406647126.0,
@@ -11,15 +11,15 @@
     "relative_order": 1,
     "properties": {
         "tempName": "Untitled1",
-        "cursorPosition": "43,0",
-        "scrollLine": "35"
+        "cursorPosition": "70,38",
+        "scrollLine": "45"
     },
     "folds": "",
-    "lastKnownWriteTime": 1608412459,
+    "lastKnownWriteTime": 1608499665,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1608412459820,
+    "last_content_update": 1608499665985,
     "read_only": false,
     "read_only_alternatives": []
 }

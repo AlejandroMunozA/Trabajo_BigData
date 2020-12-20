@@ -43,149 +43,213 @@
 
 
 
-#==================== usando twitchtracker ====================
+# Limpiar la consola
+rm(list = ls())
 
-# FALTA: Abrir y transformar a data.frame el archivo CVS
-# FALTA: FOR-LOOP para recorrer de página en página
+# Instalar la librería
+install.packages("rvest")
+# de igual forma con el resto de los paquetes
 
-# Inicializando la var de archivo con el nombre de la página a utilizar
-paginatwitchtracker <- 'https://twitchtracker.com/'
+# Invocar la librería
+library(rvest)
+library(robotstxt)
+library(selectr)
+library(xml2)
+library(dplyr)
+library(stringr)
+library(forcats)
+library(magrittr)
+library(tidyr)
+library(ggplot2)
+library(lubridate)
+library(tibble)
+library(purrr)
 
-# Leyendo el html del archivo
-webpagetwitchtracker <- read_html(paginatwitchtracker)
+#CASO DE ESTUDIO https://www.twitchmetrics.net/
 
-# Extraccion del texto contenido en la clase thumb-under
-contenidoWebtwitchtracker <- html_nodes(webpagetwitchtracker,'.thumb-under > p > a')
-print (contenidoWebtwitchtracker)
+# Asignar la url
+url <- "https://www.twitchmetrics.net/"
 
-# Viendo el contenido de la posición 1 de la variable contenidoWebtwitchtracker
-print(contenidoWebtwitchtracker[1])
+# Preguntar a robots.txt si esta permitido bajar esto devuelve TRUE/FALSE
+paths_allowed(paths = c(url))
 
-# Extrayendo los links de los videos
-linksVIDEOS <- html_attr(contenidoWebtwitchtracker,"href")
+# Obtener el código html de la página web
+pagina_web <- read_html(url)
 
-# Arreglando los links de todos los videos
-todosLosLinkstwitchtracker <- ""
-for(i in 1:27){
-  todosLosLinkstwitchtracker <- print(paste("twitchtracker",linksVIDEOS,sep = ""))
-}
+# Asignar la clase
+css_producto <- "a.a-link-normal.s-access-detail-page.s-color-twister-title-link.a-text-normal"
 
-# ###########                                                  Viendo que tiene la posicion 1 de la variable todosLosLinksXvideo
-print(todosLosLinksXvideo[1])
+# Obtener el código html que contiene el nombre del producto
+producto_html <- html_nodes(pagina_web,css_producto)
+producto_texto <- html_text(producto_html)
 
-# Extrayendo el texto de contenidoWebXVideos
-textoXVideos <- html_text(contenidoWebXVideos)
+# Exhibir los datos
+producto_texto
 
-# Viendo que tiene la posicion 1 la variable textoXVideos
-print(textoXVideos[1])
+length(producto_texto)
+tail(producto_texto)
 
-# Extraccion de duracion de cada video
-DurationXVideos <- html_nodes(webpageXVideos,'.duration')
+# Clase CSS del producto
+css_precio <- "span.a-size-base.a-color-price.s-price.a-text-bold"
 
-#Limpieza de los datos de duracion
-DuracionXVideos <- html_text(DurationXVideos)
+# Obtener el contenido de la clase en código html
+precio_html <- html_nodes(pagina_web,css_precio)
 
-# Viendo que tiene la posición 1 de la variable DuracionXVideos
-print(DuracionXVideos[1])
+# Limpiar el código para obtener el texto
+precio_texto <- html_text(precio_html)
 
-# Primer paso para extraer el numero de visitas de cada video
-VistasXVideos <- html_nodes(webpageXVideos,'.thumb-under > p > span')
+# Eliminar el signo de peso
+precio_limpio <- gsub("\\$","",precio_texto)
 
-# Limpiando los datos para tener solo el texto 
-texto_VistasXVideos <- html_text(VistasXVideos)
+# Eliminar la coma
+precio_limpio <- gsub(",","",precio_limpio)
 
-# Separando el texto obtenido con un guion para despues eliminar la duracion
-split_VistasXVideos <- strsplit(texto_VistasXVideos,"-")
+# Consultar tipo de dato
+data.class(precio_limpio)  ## character
 
-# Obteniendo el primer dato de views 
-viewsXVideos <- list()
-for(i in 1:length(split_VistasXVideos)){
-  print(split_VistasXVideos[[i]][[2]])
-  viewsXVideos[i] <- split_VistasXVideos[[i]][[2]]
-}
+length(precio_limpio)
+tail(precio_limpio)
 
-# Limpiando los datos obtenidos de views
-viewsXVideos <-  gsub("Views","",viewsXVideos)
-viewsXVideos <- gsub(" ","",viewsXVideos)
-viewsXVideos <- gsub("k","-k",viewsXVideos)  
-viewsXVideos <- gsub("M","-M",viewsXVideos)  
+# Transformamos a numérico 
+precio_numerico <- as.numeric(precio_limpio)
 
-# Separando los datos para luego reemplazar k y M numericamente
-Visitas <- strsplit(viewsXVideos,"-")
+# Unimos los datos
+productos <- data.frame(Producto = producto_texto[-1], 
+                        Precio = precio_numerico)
 
-# Crear funcion para reemplazar k y M numericamente #
+# Para mostrar la gráfica por precio
+barplot(precio_numerico)
 
-# VisitasXVideo: string -> double
-# VisitasXVideo: entrega la cantidad de visitas de cada video
-# si aparece una k se multiplica el numero por mil 
-# si aparece una M se multimplica por un millon
-# Ejemplo: VisitasXVideo(4k)-> 4000
+gc()
 
-VisitasXVideo <- function (entrada){
-  # para los elementos que no tienen ni k, ni M, se usa is.na
-  if(is.na(entrada[2])){
-    entrada[1] <- as.numeric(entrada[1])
-  }else if(entrada[2]=="k"){
-    entrada[1] <- as.numeric(entrada[1])*1000
-  }else if(entrada[2]=="M"){
-    entrada[1] <- as.numeric(entrada[1])*1000000
-  }
-  return(entrada[1])
-}
+##########################
+## CASO DE ESTUDIO IMDB ##
+##########################
 
-# Recorriendo cada elemento aplicando la funcion VisitasXVideo 
-for(i in 1:length(Visitas)){
-  Visitas[i] <- VisitasXVideo(Visitas[[i]])
-}
+# Le pregunta a robots.txt si esta permitido bajar esto devuelve TRUE/FALSE
 
-# Extrae los elementos de la lista y los pasa a una lista
-unlistVisitas <- unlist(Visitas)
+url = "https://www.imdb.com/search/title?groups=top_250&sort=user_rating"
+paths_allowed(paths = c(url))
+
+# Leer el HTML
+imdb <- read_html(url)
+
+# formato html, aca ya esta toda la info
+
+imdb
+
+#Tomemos el html y busquemos la categoría títulos (ver filmina)
+#imdb es una función, le estoy pasando argumentos a traves del operador %>%
+# le paso el nodo donde esta la info que quiero y le pido el texto de ahí
+
+imdb %>%
+  html_nodes(".lister-item-content h3 a") %>%
+  html_text() -> movie_title
+
+#ver los títulos
+movie_title
 
 
-#==================== UNA GRAN TABLA ====================#
+#ahora quiero el año, como viene en texto lo quiero reformatear as.Date
 
-# Creando una tabla con mas de una columna
-dfvideos <- data.frame(LINKS = todosLosLinksXvideo, TITULO = textoXVideos, DURACION = DuracionXVideos, VIEWS = unlistVisitas)
+imdb %>%
+  html_nodes(".lister-item-content h3 .lister-item-year") %>%
+  html_text() %>%
+  str_sub(start = 2, end = 5) %>%
+  as.Date(format = "%Y") %>%
+  year() -> movie_year
 
-# FALTA: unir los data.frames
+movie_year
 
-##### Se guardan los datos porque hay que empezar a tener algo ya po :c
-#alamacenando la informacion en CSV
-write.csv(dfvideos, file="01TablaXVideos.csv")
+#Ahora quiero la duración, reformateo a número 
 
-#rbin recordar# 
+imdb %>%
+  html_nodes(".lister-item-content p .runtime") %>%
+  html_text() %>%
+  str_split(" ") %>%
+  map_chr(1) %>%
+  as.numeric() -> movie_runtime
 
-# Tablas datos por separado
+movie_runtime
 
-# Tabla de los titulos de la pág 1 de new 
-tabla_titulos <- table(textoXVideos)
+#genero
 
-# Transformando a data framtabla
-tituloXVideos <- as.data.frame(tabla_titulos)
+imdb %>%
+  html_nodes(".lister-item-content p .genre") %>%
+  html_text() %>%
+  str_trim() -> movie_genre
 
-# Unificando los títulos
-todosLosTitulosXVideo <- ""
-for(i in 1 : length(textoXVideos)){
-  todosLosTitulosXVideo <- paste(todosLosTitulosXVideo," ",textoXVideos[[i]])
-}
+movie_genre
 
-# Separando las palabras por espacio
-todosLosTitulosXVideo <- strsplit(todosLosTitulosXVideo," ")[[1]]
+#rating
 
-# Pasando todas las palabras a minúsculas
-todosLosTitulosXVideo <- tolower(todosLosTitulosXVideo)
+imdb %>%
+  html_nodes(".ratings-bar .ratings-imdb-rating") %>%
+  html_attr("data-value") %>% 
+  as.numeric() -> movie_rating
 
-# Contando palabras
-unlistTitulosXVideos <- unlist(todosLosTitulosXVideo)
-tablaXVideos <- table(unlistTitulosXVideos)
+movie_rating
 
-# Transformando a data framtabla
-tituloXVideos <- as.data.frame(tablaXVideos)
+#ahora cambia un poco porque estoy pidiendo un atributo, cuanta gente voto por los ratings
 
-#Duracion de videos en tabla
-tabla_duracion <- table(DuracionXVideos)
-Duracion_tabla <- as.data.frame(tabla_duracion)
+imdb %>%
+  html_nodes(xpath = '//meta[@itemprop="ratingCount"]') %>% 
+  html_attr('content') %>% 
+  as.numeric() -> movie_votes
 
-# Tabla de numero de visitas
-# El "transpose" es para que quede en vertical
-df <- data.frame("vistas" = transpose(a))
+movie_votes
+
+
+#otro atributo, recaudación, pero reformateado
+
+imdb %>%
+  html_nodes(xpath = '//span[@name="nv"]') %>%
+  html_text() %>%
+  str_extract(pattern = "^\\$.*") %>%
+  na.omit() %>%
+  as.character() %>%
+  append(values = NA, after = 30) %>%
+  append(values = NA, after = 46) %>%
+  str_sub(start = 2, end = nchar(.) - 1) %>%
+  as.numeric() -> movie_revenue
+
+movie_revenue
+
+# junto todo
+top_50 <- tibble(title = movie_title, release = movie_year, 
+                 `runtime (mins)` = movie_runtime, genre = movie_genre, rating = movie_rating, 
+                 votes = movie_votes, `revenue ($ millions)` = movie_revenue)
+
+top_50
+
+#Exportar a excel
+write.csv2(top_50,"top50.csv")
+
+gc()
+
+#########################
+## CASO DE ESTUDIO BNA ##
+#########################
+
+
+url = "htpps://www.bna.com.ar/Personas"
+paths_allowed(paths = c(url))
+
+bna <- read_html(url)
+
+gc()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
