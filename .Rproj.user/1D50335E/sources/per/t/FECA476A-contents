@@ -65,10 +65,12 @@ library(lubridate)
 library(tibble)
 library(purrr)
 
-#CASO DE ESTUDIO https://www.twitchmetrics.net/
+###############################
+## CASO DE ESTUDIO AMAZON MX ##
+###############################
 
 # Asignar la url
-url <- "https://www.twitchmetrics.net/"
+url <- "https://www.amazon.com.mx/b/ref=s9_acsd_hfnv_hd_bw_bAcAgpX_ct_x_ct00_w?_encoding=UTF8&node=9725407011&pf_rd_m=AVDBXBAVVSXLQ&pf_rd_s=merchandised-search-4&pf_rd_r=Q47SQG6GBGGECT1SXNZY&pf_rd_t=101&pf_rd_p=8cc61471-874f-5f7f-96d7-e2b634466523&pf_rd_i=9725377011"
 
 # Preguntar a robots.txt si esta permitido bajar esto devuelve TRUE/FALSE
 paths_allowed(paths = c(url))
@@ -238,8 +240,6 @@ paths_allowed(paths = c(url))
 bna <- read_html(url)
 
 gc()
-
-
 
 
 
